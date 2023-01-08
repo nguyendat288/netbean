@@ -1,0 +1,38 @@
+body{
+    background: url("tải xuống.jpg") center / cover no-repeat;
+    font-family: 'Georgia',VnArial;
+    font-size: 25px;
+
+}
+#start-box{
+    width: 350px;
+    height: 350px;
+    background-color: #eaeaea;
+    margin: 0 auto;
+    border: 5px;
+}
+#play {
+    width: 200px;
+    height: 50px;
+    background-color: bisque;
+    font-size: x-large;
+}
+#end-game{
+
+    width: 350px;
+    height: 350px;
+    background-color: #eaeaea;
+    margin: 0 auto;
+    border: 5px;
+    padding-top: 200px;
+}
+#winagain{
+
+    width: 200px;
+    height: 50px;
+    background-color: bisque;
+    font-size: x-large;
+}
+#myCanvas{
+    background-color: #99ff99;
+}

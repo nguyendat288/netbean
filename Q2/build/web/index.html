@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas {
+            background-color:#00FFFF ;
+
+        }
+    </style>
+    <script src="test1.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="start-box">
+    <form action="">
+        <div>
+            <center><h1>Welcome!!!</h1></center>
+            <div>
+                <div><p>Tên của bạn là :</p></div>
+                <input type="text" id="a" class="name2" placeholder="Nhập tên"><br><br>
+                <span><center><button type="button" id="play" onclick="start2()">Play</button></center></span>
+            </div>
+        </div>
+    </form>
+</div>
+<!--===============================================-->
+<div id="canvas1" style="display: none">
+    <center>
+        <canvas id="myCanvas" width="600px" height="600px" style="border: 1px solid black"></canvas>
+    </center>
+</div>
+<!--==================================================-->
+<div id="end-game" style="display: none">
+    <div>
+        <div>
+            <center><p id="win">Congratulations!!! <br>
+                You Win</p></center>
+        </div>
+
+    </div>
+    <div>
+        <div id="lose">
+            <center><p> You Lose !!!</p></center>
+            <p id="score"></p>
+        </div>
+    </div>
+    <span>
+       <center> <button id="winagain" onclick="window.location.reload()"> Play Again</button></center>
+    </span>
+</div>
+
+<script>
+    let name2;
+    let canvas = document.getElementById('myCanvas');
+    let pen = canvas.getContext('2d');
+    let interval = setInterval(draw, 10);
+    let pad = {
+        width: 150,
+        height: 20,
+        x: 0,
+        y: canvas.height - 20,
+        speed: 45,
+    }
+    let Bricks = {
+        brickX: 25,
+        brickY: 25,
+        range: 25,
+        width: 90,
+        height: 25,
+        totalRow: 3,
+        totalCol: 5,
+
+    }
+    let x = 300;
+    let y = 300;
+    let circle = new Circle(x, y);
+    circle.drawCircle(pen);
+    let isGameOver = false;
+    let isGameWin = false;
+    let Score = 0;
+    let maxScores = Bricks.totalCol * Bricks.totalRow;
+
+    //==================================
+    function drawScore() {
+        pen.font = "16px Arial";
+        pen.fillStyle = "#0095DD";
+        pen.fillText("Score: " + Score, 8, 20);
+    }
+
+    //================================
+    let loop;
+
+    function start2() {
+        loop = setInterval(moveCircle, 10)
+    }
+
+    //===============================================
+    let BricksList = [];
+    for (let i = 0; i < Bricks.totalRow; i++) {
+        for (let j = 0; j < Bricks.totalCol; j++) {
+            BricksList.push({
+                x: Bricks.brickX + j * (Bricks.width + Bricks.range),
+                y: Bricks.brickY + i * (Bricks.height + Bricks.range),
+                checkBreak: false
+            });
+        }
+    }
+
+    //==================================
+    let dx = 1;
+    let dy = 1;
+
+    function checkCrash() {
+        BricksList.forEach(function (b) {
+            if (!b.checkBreak) {
+                if (circle.x >= b.x && circle.x <= b.x + Bricks.width && circle.y + 15 >= b.y && circle.y - 15 <= b.y + Bricks.height) {
+                    dy = -dy;
+                    b.checkBreak = true;
+                    Score += 1;
+                    if (Score >= maxScores) {
+                        isGameOver = true;
+                        isGameWin = true;
+                        // document.location.reload();
+                        clearInterval(interval);
+                    }
+                }
+            }
+        })
+    }
+
+    // =============================================
+    function moveCircle() {
+        document.getElementById("canvas1").style.display = "block"
+        document.getElementById("start-box").style.display = "none"
+        pen.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight)
+        if (!isGameOver) {
+            pen.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+            if (circle.x < 15 || circle.x > canvas.clientWidth - 15) {
+                dx = -dx;
+            }
+            if (circle.y < 15) {
+                dy = -dy;
+            }
+            circle.x += dx;
+            circle.y += dy;
+            circle.drawCircle(pen);
+            draw()
+            bouncedBack()
+            drawBricks()
+            checkCrash()
+            drawScore()
+            if (circle.y > canvas.clientHeight - 15) {
+                checkGameOver()
+                isGameOver = true;
+                clearInterval(loop)
+
+
+            }
+        } else {
+            checkGameOver();
+            clearInterval(loop);
+            // document.location.reload();
+        }
+    }
+
+    //=================================================
+    function checkGameOver() {
+        name2 = document.getElementById("a").value;
+        if (isGameWin) {
+            document.getElementById("canvas1").style.display = "none"
+            document.getElementById("end-game").style.display = "block"
+            document.getElementById("lose").style.display = "none"
+            document.getElementById("winagain").style.display = "block"
+        } else {
+            document.getElementById("score").innerHTML += name2 + ", You lose with " + Score + " score";
+            document.getElementById("canvas1").style.display = "none"
+            document.getElementById("end-game").style.display = "block"
+            document.getElementById("win").style.display = "none"
+            document.getElementById("winagain").style.display = "block"
+        }
+    }
+
+    //======================================================
+    function bouncedBack() {
+        if (circle.x + 15 >= pad.x && circle.x + 15 <= pad.x + pad.width && circle.y + 15 >= canvas.height - pad.height) {
+            dy = -dy;
+        }
+    }
+
+
+    //==========================================================
+    function draw() {
+        let pen = canvas.getContext('2d');
+        pen.beginPath();
+        pen.rect(pad.x, pad.y, pad.width, pad.height);
+        pen.fillStyle = "red";
+        pen.fill();
+        pen.closePath();
+    }
+
+    draw();
+
+    //==============================================
+    function drawBricks() {
+        BricksList.forEach(function (b) {
+            if (!b.checkBreak) {
+                pen.beginPath();
+                pen.rect(b.x, b.y, Bricks.width, Bricks.height);
+                pen.fill();
+                pen.closePath();
+            }
+        })
+    }
+
+    //==========================================
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode == 37 && pad.x > 0) {
+            pad.x -= pad.speed;
+        } else if (event.keyCode == 39 && pad.x < canvas.clientWidth - 150) {
+            pad.x += pad.speed;
+        }
+    })
+
+</script>
+</body>
+</html>
